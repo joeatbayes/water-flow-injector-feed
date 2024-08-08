@@ -55,10 +55,15 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 
 
 ## parts I used
+* [Gredia G1 Hall effect wwater flow sensor](https://www.amazon.com/GREDIA-Sensor-Food-Grade-Flowmeter-Counter/dp/B07RF5D156/)  I used 2 sensors
 * [3 gang box for assembly of entire unit](https://www.amazon.com/Madison-Electric-Products-MSB3G-Adjustable/dp/B00H8NUVQA)
+* [Silicone ribbon cable to connect sensors OLED](https://www.amazon.com/MECCANIXITY-Ribbon-Silicone-Stranded-Tinned/dp/B0CBB3C91V)
 
 * Face Plate for 3 Gang box -  3D printed - TODO: ADD Picture and 
   CAD drawing here.
+    * QTY 2  6/32 by 1.5" machine screws - hold relay and cpu support to faceplate
+    * Qty 6  #4 X 3/4" philips screw - connect faceplate to box
+    * Qty 6   #4 X 1/2" philips screw - connect oled to faceplate
 
 * CPU board holder to mount CPU board below digital relay - TODO: Add picture 
   and CAD drawing here.
@@ -70,7 +75,9 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 * [40 amp Digital Relay for AC](https://www.aliexpress.us/item/3256804475347699)
 * [Recomended CPU](https://www.aliexpress.us/item/3256805991471052.html) I used a propriatary board I made for another purpose but this CPU would have done just as well.
 * [Fuse holder for 10 amp fuse](https://www.amazon.com/KOLACEN-Automotive-Inline-5x20mm-Holder/dp/B071G1L98V) Installed on Live wire 
-* [Plug Genric 3 prong 120V outlet]
+* Wall Plug Genric 3 prong 120V outlet
+* 3 prong male plug to supply power
+* 7 foot 3 conductor flexible wire for power supply cord
 
 
 ## Recomended Changes 
