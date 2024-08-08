@@ -25,8 +25,11 @@
   #define SCREEN_HEIGHT 64  // OLED display height, in pixels
   #define OLED_RESET -1     //   QT-PY / XIAO
 #endif
-#define serial
+#undef USB_SER
 #define SERIAL_BAUD 115200
+#define SAVE_EVERY_SEC 3600
+#define LITER_PER_GAL 3.78541
+#include <Preferences.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
@@ -35,14 +38,17 @@
 /* Uncomment the initialize the I2C address , uncomment only one, If you get a totally blank screen try the other*/
 #define i2c_Address 0x3c  //initialize with the I2C addr 0x3C Typically eBay OLED's
 //#define i2c_Address 0x3d //initialize with the I2C addr 0x3D Typically Adafruit OLED's
-
+Preferences preferences;
 //Adafruit_SSD1306 display;
-Adafruit_SH1106G *display;
-
-float totLit1=0;
-float totLit2=0;
+Adafruit_SH1106G *Display;
+double TotLit=0;
+double TotLit1=0;
+double TotLit2=0;
+double LastSaveTotLit1=0;
+double LastSaveTotLit2=0;
 float MotorStarted=0;
 float MotorStopped=0;
+unsigned long LastMeterSaveMs = 0;
 #define MIN_MOTOR_OFF_SEC 10
 #define MIN_MOTOR_ON_SEC 30
 
@@ -113,21 +119,26 @@ float netLiterFlow(float literPerMin, float elapSec) {
   return (literPerMin / 60) * elapSec;
 }
 
+bool but,bdt,bst,bet;
 
 void bUpTouch() {
-  Serial.println("bup");
+  but=true;
+  //Serial.println("bup");
 }
 
 void bDnTouch() {
-  Serial.println("bdn");
+  bdt=true;
+  //Serial.println("bdn");
 }
 
 void bSelTouch() {
-  Serial.println("bsel");
+  bst=true;
+  //Serial.println("bsel");
 }
 
 void bExTouch() {
-  Serial.println("bex");
+  bet=true;
+  //Serial.println("bex");
 }
 
 unsigned long s1Cnt = 0;
@@ -157,28 +168,38 @@ void setup() {
   digitalWrite(PIN_LED, HIGH);
   digitalWrite(PIN_MOTOR_ENABLE, LOW);
   Wire.setTimeout(3000);
-
+  preferences.begin("meter", false);
   delay(40);
+  #ifdef USB_SER
   Serial.begin(115200);
+  #endif
+
   Wire.begin(PIN_SDA, PIN_SCL);
   //Wire.setPins(PIN_SDA, PIN_SCL);
   delay(40);
-  Serial.println("start");
-  Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-  display.begin(i2c_Address, true);
-  Serial.println("display init");
+  
+  #ifdef USB_SER
+    Serial.println("start");
+  #endif 
 
-  display.display();
+  Display = new Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+  Display->begin(i2c_Address, true);
+  
+  #ifdef USB_SER
+    Serial.println("display init");
+  #endif
+
+  Display->display();
   delay(40);
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setRotation(0);
-  display.display();
+  Display->clearDisplay();
+  Display->setTextSize(1);
+  Display->setTextColor(WHITE);
+  Display->setRotation(0);
+  Display->display();
   delay(1000);
-  display.clearDisplay();
-  display.println("JOE");
-  display.display();
+  Display->clearDisplay();
+  Display->println("JOE");
+  Display->display();
   s1LastCalc = millis();
   s2LastCalc = s1LastCalc;
   touchAttachInterrupt(PIN_BUP, bUpTouch, touchThreashold);
@@ -187,8 +208,19 @@ void setup() {
   touchAttachInterrupt(PIN_BEX, bExTouch, touchThreashold);
 
   attachInterrupt(digitalPinToInterrupt(PIN_WSENSE1), pulseS1Rise, RISING);
-  attachInterrupt(digitalPinToInterrupt(PIN_WSENSE2), pulseS2Rise, RISING);  
-  Serial.println("end setup");
+  attachInterrupt(digitalPinToInterrupt(PIN_WSENSE2), pulseS2Rise, RISING); 
+  #ifdef USB_SER
+     Serial.println("end setup");
+  #endif
+
+  TotLit1 = preferences.getDouble("TotLit1",0);
+  TotLit2 = preferences.getDouble("TotLit2",0);
+  LastSaveTotLit1 = TotLit1;
+  LastSaveTotLit2 = TotLit2;
+  LastMeterSaveMs = millis();
+  // Retreive totalAcumReading from Properties
+
+
 }
 
 
@@ -199,14 +231,16 @@ void loop() {
   // put your main code here, to run repeatedly:
   digitalWrite(PIN_LED, !digitalRead(PIN_LED));
   
-  
+ 
   delay(1000);
   //Serial.println(cnt);
   int bur = touchRead(PIN_BUP);
   int bdr = touchRead(PIN_BDN);
   int bsr = touchRead(PIN_BSEL);
   int ber = touchRead(PIN_BEX);
-  //Serial.printf("bur=%d bdr=%d bsr=%d ber=%d\n", bur, bdr, bsr, ber);
+  #ifdef USB_SER
+    Serial.printf("bur=%d bdr=%d bsr=%d ber=%d\n", bur, bdr, bsr, ber);
+  #endif
 
   // Take copy of our counters so the ISR can continue  
   disableInterrupt(PIN_WSENSE1);
@@ -230,28 +264,32 @@ void loop() {
   float ppsec1 = pulsePerSec(s1CntT, esec1);    
   float lpm1 = calcLPMYFB10(ppsec1);
   float nlit1 = netLiterFlow(lpm1, esec1);
-  totLit1 += nlit1;
+  TotLit1 += nlit1;
   if (ppsec1 > 1) {
-    Serial.print("1 cnt="); Serial.print(s1CntT);
-    Serial.print(" pps="); Serial.print(ppsec1);  
-    Serial.print(" esec="); Serial.print(esec1);
-    Serial.print(" lpm="); Serial.print(lpm1);
-    Serial.print(" nlit="); Serial.println(nlit1);  
-    Serial.print(" tlit="); Serial.println(totLit1);  
+    #ifdef USB_SER
+      Serial.print("1 cnt="); Serial.print(s1CntT);
+      Serial.print(" pps="); Serial.print(ppsec1);  
+      Serial.print(" esec="); Serial.print(esec1);
+      Serial.print(" lpm="); Serial.print(lpm1);
+      Serial.print(" nlit="); Serial.println(nlit1);  
+      Serial.print(" tlit="); Serial.println(totLit1);  
+    #endif
   }
 
   float esec2 = elapSec(s2LastT, currMs);
   float ppsec2 = pulsePerSec(s2CntT, esec2);
   float lpm2 =  calcLPMGrediaG1Inch(ppsec2);
   float nlit2 = netLiterFlow(lpm2, esec2);
-  totLit2 += nlit2;
+  TotLit2 += nlit2;
   if (ppsec2 > 1) {
-    Serial.print("2 cnt="); Serial.print(s2CntT);
-    Serial.print(" pps="); Serial.print(ppsec2);  
-    Serial.print(" esec="); Serial.print(esec2);
-    Serial.print(" lpm="); Serial.print(lpm2);
-    Serial.print(" nlit="); Serial.print(nlit2);  
-    Serial.print(" tlit="); Serial.println(totLit2);  
+    #ifdef USB_SER
+      Serial.print("2 cnt="); Serial.print(s2CntT);
+      Serial.print(" pps="); Serial.print(ppsec2);  
+      Serial.print(" esec="); Serial.print(esec2);
+      Serial.print(" lpm="); Serial.print(lpm2);
+      Serial.print(" nlit="); Serial.print(nlit2);  
+      Serial.print(" tlit="); Serial.println(totLit2);  
+    #endif
   }
 
   if ((lpm1 > 0.1) || (lpm2 > 0.1)) {     
@@ -259,7 +297,39 @@ void loop() {
   } else {
     setMotorOff();
   }
-  //Serial.printf("cnt1=%ld %cnt2=%ld ppsec1=%3.3f ppsec2=%3.3f lpm1=%3.3f lpm2=%3.3f\n", 
-  //   (long) s1CntT, (long) s2CntT,ppsec1, ppsec2, lpm1,lpm2);
+
+  TotLit = TotLit1 + TotLit2;
+  
+  //Display->clearDisplay();
+  //Display->printf("lpm1=%0.1f  lpm2=%0.2f\n", lpm1,lpm2);
+  
+  Display->clearDisplay();
+  Display->setCursor(0,0);
+  Display->setTextSize(2);
+  Display->printf("%0.1f\n", TotLit / LITER_PER_GAL);  
+  Display->setTextSize(1);
+  Display->print("GPM: ");
+  Display->printf("%0.1f",(lpm1 + lpm2)/LITER_PER_GAL);
+  Display->display();
+
+  // Save our new reading if our save timer changed.
+  float sinceSave = elapSec(LastMeterSaveMs, millis());
+  if (sinceSave > SAVE_EVERY_SEC) {
+    if (LastSaveTotLit1 != TotLit1) {  
+      preferences.putDouble("TotLit1", TotLit1);
+      LastSaveTotLit1 = TotLit1;
+    }
+
+    if (LastSaveTotLit2 != TotLit2) {
+      preferences.putDouble("TotLit2", TotLit2);
+      LastSaveTotLit2 = TotLit2;
+    }
+    LastMeterSaveMs = millis();
+  }
+
+  #ifdef USB_SER
+    //Serial.printf("cnt1=%ld %cnt2=%ld ppsec1=%3.3f ppsec2=%3.3f lpm1=%3.3f lpm2=%3.3f\n", 
+    //   (long) s1CntT, (long) s2CntT,ppsec1, ppsec2, lpm1,lpm2);
+  #endif
 }
 
