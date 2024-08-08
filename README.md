@@ -43,18 +43,19 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 
 
 # Main Unit Wiring
-* Plug to Box standard 3 prong plug
-* Black from wall to 10 Amp Fuse holder to Both USB 5 volt supply and one pole of relay.
-  * Black from Switched side Relay to Black Plug Lug
-* White from Wall to both USB 5 volt suplly and Neutral Plug Lug
-* Green from wall to Ground Plug Lug
+* Power supply standard 3 prong plug to box. Wiring connected with standard wiring nuts. 
+* Black wire from wall to 10 Amp Fuse holder to Both USB 5 volt supply and one pole of relay.
+  * Black from Switched side Relay to Black wire lug on Receptacle Lug
+* White from Wall to both USB 5 volt suplly and Neutral Lug on receptacle Lug
+* Green from wall to Ground Plug Lug on receptacle.
+
 
 # 3D printed parts
 * Faceplate for 3 Gang box - Special focus here was reserving room for 
   oled supply,  outlet plug and Digital Relay.  I wanted the activation 
   LED for the relay to show through the face plate.  
-
 * CPU holder mounted below relay
+* qty 2 angled brackets to hang unit to wall stud.
 
 
 ## parts I used
@@ -74,7 +75,7 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 * [5v usb power supply 5V](https://www.amazon.com/Adapter-UorMe-Charger-Charging-Compatible/dp/B08LGRN2NR)  My board 
   accepts 5V to 40V in.  Other boards may need 3V power supply. This one was 
   small enough to keep inside the 3 gang unit.
-* [OLED display](https://www.aliexpress.us/item/2251832498844654.html)
+* [1.3" OLED display](https://www.aliexpress.us/item/2251832498844654.html)
 * [40 amp Digital Relay for AC](https://www.aliexpress.us/item/3256804475347699)
 * [Recomended CPU](https://www.aliexpress.us/item/3256805991471052.html) I used a propriatary board I made for another purpose but this CPU would have done just as well.
 * [Fuse holder for 10 amp fuse](https://www.amazon.com/KOLACEN-Automotive-Inline-5x20mm-Holder/dp/B071G1L98V) Installed on Live wire 
@@ -82,8 +83,30 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 * 3 prong male plug to supply power
 * 7 foot 3 conductor flexible wire for power supply cord
 
+### Plumbing Parts
+Our system is based on 1" pex so we need to adapt the single water 
+pip to allow water to flow thorugh both sensors in parralell then 
+caputure the water back into a single pipe.
+* 1" PEX 90 from water source
+* PEX T and PEX 90 to feed water to two sensors
+* qty 2 -  1" Female NPT brass fittings to connect to sensors
+* qty 2 G1 sensors with male 1" NPT 
+* qty 2 - 1" Femal NPT  brass fitting for other side sensors
+* Pex 90 and Pex T 
+* Pex 90 to feed water back into pipe
+* Associated 1" Pex clamps  and Teflon tape for NPT connections.
+
 
 ## Recomended Changes 
 * Use a 3.3V gate Triac such as [BTB06-600B](https://www.aliexpress.us/item/3256806576807703.html) in liue of solid state relay.  The Triac is smaller and capable of carrying the current needed for this applicaiton.
+
 * Make a new PCB with exact match for this use.
-* Use Circuit breaker with external reset button in liue of inline fuse.
+  * Add the triac direct to board with AC terminal lugs on board.  
+  * Add AC input to DC 3.3V power supply direct on board in liue of wall bud
+  * For buttons Add pull up resistors with bleed and direct wire to CPU but make jumper selectable so can choose to use them for capacitive sense if needed.  
+  * Consider adding fuse on board in-liue of pigtale fuse.  These changes
+would simplify wiring in the box. 
+* Consider Use Circuit breaker with external reset button in liue of inline fuse.
+
+## Things that Failed
+* Current version of Arduino with ESP32 S3 mini used in this design does not properly route interupts from touch sensors.  They can be read find using touchRead.  Decided to just use normal old buttons instead but turned out that didn't need any user input at least not so far.
