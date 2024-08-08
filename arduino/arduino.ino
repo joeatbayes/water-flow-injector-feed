@@ -262,7 +262,7 @@ void loop() {
   // Now calculate or current flow rate and total liters that have flowed
   float esec1 = elapSec(s1LastT, currMs);
   float ppsec1 = pulsePerSec(s1CntT, esec1);    
-  float lpm1 = calcLPMYFB10(ppsec1);
+  float lpm1 = calcLPMGrediaG1Inch(ppsec1);
   float nlit1 = netLiterFlow(lpm1, esec1);
   TotLit1 += nlit1;
   if (ppsec1 > 1) {
