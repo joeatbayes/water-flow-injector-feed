@@ -2,6 +2,7 @@
 // https://community.home-assistant.io/t/calibration-settings-for-yf-b10-pulse-counter/615651/2
 
 #define S3Module_1_1
+#define sens2
 #ifdef S3Module_1_1
   #define PIN_LED 11
   #define PIN_SENSE_PWR 47
@@ -51,6 +52,9 @@ float MotorStopped=0;
 unsigned long LastMeterSaveMs = 0;
 #define MIN_MOTOR_OFF_SEC 10
 #define MIN_MOTOR_ON_SEC 30
+unsigned long flowStartedMs=0;
+float lpm1=0;
+float lpm2=0;
 
 float elapSec(unsigned long startMs, unsigned long stopMs) {
   return (float)(stopMs - startMs) / 1000.0;
@@ -59,7 +63,9 @@ float elapSec(unsigned long startMs, unsigned long stopMs) {
 void setMotorOn() {
   if (!(digitalRead(PIN_MOTOR_ENABLE))) {
     float stopedSec = elapSec(MotorStopped, millis());
-    Serial.print("motOnStopedSec="); Serial.println(stopedSec);
+    #ifdef USB_SER
+      Serial.print("motOnStopedSec="); Serial.println(stopedSec);
+    #endif
     if (stopedSec > MIN_MOTOR_OFF_SEC) {
       MotorStarted = millis();
       digitalWrite(PIN_MOTOR_ENABLE, HIGH);
@@ -75,7 +81,9 @@ void setMotorOn() {
 void setMotorOff() {
   if (digitalRead(PIN_MOTOR_ENABLE)) {
     float runSec = elapSec(MotorStarted, millis());
-    Serial.print("moOffRunSEc="); Serial.println(runSec);
+    #ifdef USB_SER
+      Serial.print("moOffRunSEc="); Serial.println(runSec);
+    #endif
     if (runSec > MIN_MOTOR_ON_SEC) {
       MotorStopped = millis();
       digitalWrite(PIN_MOTOR_ENABLE, LOW);
@@ -176,7 +184,7 @@ void setup() {
 
   Wire.begin(PIN_SDA, PIN_SCL);
   //Wire.setPins(PIN_SDA, PIN_SCL);
-  delay(40);
+  delay(400);
   
   #ifdef USB_SER
     Serial.println("start");
@@ -198,7 +206,7 @@ void setup() {
   Display->display();
   delay(1000);
   Display->clearDisplay();
-  Display->println("JOE");
+  Display->println("Starting");
   Display->display();
   s1LastCalc = millis();
   s2LastCalc = s1LastCalc;
@@ -231,38 +239,42 @@ void loop() {
   // put your main code here, to run repeatedly:
   digitalWrite(PIN_LED, !digitalRead(PIN_LED));
   
- 
   delay(1000);
   //Serial.println(cnt);
-  int bur = touchRead(PIN_BUP);
-  int bdr = touchRead(PIN_BDN);
-  int bsr = touchRead(PIN_BSEL);
-  int ber = touchRead(PIN_BEX);
+  //int bur = touchRead(PIN_BUP);
+  //int bdr = touchRead(PIN_BDN);
+  //int bsr = touchRead(PIN_BSEL);
+  //int ber = touchRead(PIN_BEX);
   #ifdef USB_SER
     Serial.printf("bur=%d bdr=%d bsr=%d ber=%d\n", bur, bdr, bsr, ber);
   #endif
 
-  // Take copy of our counters so the ISR can continue  
-  disableInterrupt(PIN_WSENSE1);
   unsigned long currMs = millis();
-  unsigned long s1CntT = s1Cnt;
-  unsigned long s1LastT = s1LastCalc;
-  s1Cnt = 0;
-  s1LastCalc = millis();
-  enableInterrupt(PIN_WSENSE1);
+  #ifdef sens1
+    // Take copy of our counters so the ISR can continue  
+    disableInterrupt(PIN_WSENSE1);
+    
+    unsigned long s1CntT = s1Cnt;
+    unsigned long s1LastT = s1LastCalc;
+    s1Cnt = 0;
+    s1LastCalc = millis();
+    enableInterrupt(PIN_WSENSE1);
+  #endif
 
-  disableInterrupt(PIN_WSENSE2);
-  unsigned long s2CntT = s2Cnt;
-  unsigned long s2LastT = s2LastCalc;
-  s2Cnt = 0;  
-  s2LastCalc = millis();  
-  enableInterrupt(PIN_WSENSE2);
+  #ifdef sens2
+    disableInterrupt(PIN_WSENSE2);
+    unsigned long s2CntT = s2Cnt;
+    unsigned long s2LastT = s2LastCalc;
+    s2Cnt = 0;  
+    s2LastCalc = millis();  
+    enableInterrupt(PIN_WSENSE2);
+  #endif
 
-
+  #ifdef sens1
   // Now calculate or current flow rate and total liters that have flowed
   float esec1 = elapSec(s1LastT, currMs);
   float ppsec1 = pulsePerSec(s1CntT, esec1);    
-  float lpm1 = calcLPMGrediaG1Inch(ppsec1);
+  lpm1 = calcLPMGrediaG1Inch(ppsec1);
   float nlit1 = netLiterFlow(lpm1, esec1);
   TotLit1 += nlit1;
   if (ppsec1 > 1) {
@@ -275,26 +287,46 @@ void loop() {
       Serial.print(" tlit="); Serial.println(totLit1);  
     #endif
   }
+  #endif
 
-  float esec2 = elapSec(s2LastT, currMs);
-  float ppsec2 = pulsePerSec(s2CntT, esec2);
-  float lpm2 =  calcLPMGrediaG1Inch(ppsec2);
-  float nlit2 = netLiterFlow(lpm2, esec2);
-  TotLit2 += nlit2;
-  if (ppsec2 > 1) {
-    #ifdef USB_SER
-      Serial.print("2 cnt="); Serial.print(s2CntT);
-      Serial.print(" pps="); Serial.print(ppsec2);  
-      Serial.print(" esec="); Serial.print(esec2);
-      Serial.print(" lpm="); Serial.print(lpm2);
-      Serial.print(" nlit="); Serial.print(nlit2);  
-      Serial.print(" tlit="); Serial.println(totLit2);  
-    #endif
-  }
+  #ifdef sens2
+    float esec2 = elapSec(s2LastT, currMs);
+    float ppsec2 = pulsePerSec(s2CntT, esec2);
+    lpm2 =  calcLPMGrediaG1Inch(ppsec2);
+    float nlit2 = netLiterFlow(lpm2, esec2);
+    TotLit2 += nlit2;
+    if (ppsec2 > 1) {
+      #ifdef USB_SER
+        Serial.print("2 cnt="); Serial.print(s2CntT);
+        Serial.print(" pps="); Serial.print(ppsec2);  
+        Serial.print(" esec="); Serial.print(esec2);
+        Serial.print(" lpm="); Serial.print(lpm2);
+        Serial.print(" nlit="); Serial.print(nlit2);  
+        Serial.print(" tlit="); Serial.println(totLit2);  
+      #endif
+    }
+  #endif
 
-  if ((lpm1 > 0.1) || (lpm2 > 0.1)) {     
-     setMotorOn();
+  float lpm = lpm1 + lpm2;
+
+  // If we detect water flowing for more than 15 
+  // seconds then turn the motor on.  Otherwise turn
+  // the motor off.  We know the G1 can not measure 
+  // flows less than about 1GMP accuratly.   We have 
+  // also observed occasional noise in the pulses so
+  // we want to avoid turning motor on unless water 
+  // is flowing enough to ensure it is not a noise pulse.
+  if (lpm > 2.5) {  
+     if (flowStartedMs == 0) {
+        flowStartedMs = millis();        
+     } else {
+       float elapFlowSec = elapSec(flowStartedMs,millis());
+       if (elapFlowSec > 15.0) {
+          setMotorOn();
+       }
+     }
   } else {
+    flowStartedMs = 0;
     setMotorOff();
   }
 
