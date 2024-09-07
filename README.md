@@ -15,7 +15,7 @@ Our hydrogen peroxide injector pump is not variable speed so we simply detect an
       flow is 1.35LPM for the YB-B10. Both devices rate their flow detection
       G1 is rated for 1..60LPM   The YB-B10 is rated for 2..60LPM
 
-Total Water and current gallons per minute are displayed on OLED display.  It permenantly saves this once and hour so total is not lost after reboot.    It also computes GPM for each sennsor and displays on OLED
+Total Water and current gallons per minute are displayed on OLED display.  It permanently saves this once and hour so total is not lost after reboot.    It also computes GPM for each sensor and displays on OLED
 
 
 Uses ESP32-s3 based RainAmp controller board but should work with any generic ESP32 module with minor pin changes Uses SH1106 1.3 inch OLED display over I2C for user interface.  Uses push buttons for Up, Down, Sel, Exit.  This board
@@ -30,7 +30,7 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 * Pin meter water flow pulse sensor 2 - 8 
 * VCC 3.3V to Sensor 1, sensor 2 and OLED.
 * GND to sensor 1, sensor 2 and OLED
-* Buton support
+* Button support
     Buttons not used in Version 1 but were added to 
     face place and wired into CPU for when I find a
     need. 
@@ -46,20 +46,20 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 * Power supply standard 3 prong plug to box. Wiring connected with standard wiring nuts. 
 * Black wire from wall to 10 Amp Fuse holder to Both USB 5 volt supply and one pole of relay.
   * Black from Switched side Relay to Black wire lug on Receptacle Lug
-* White from Wall to both USB 5 volt suplly and Neutral Lug on receptacle Lug
+* White from Wall to both USB 5 volt supply and Neutral Lug on receptacle Lug
 * Green from wall to Ground Plug Lug on receptacle.
 
 
 # 3D printed parts
 * Faceplate for 3 Gang box - Special focus here was reserving room for 
-  oled supply,  outlet plug and Digital Relay.  I wanted the activation 
+  OLED supply,  outlet plug and Digital Relay.  I wanted the activation 
   LED for the relay to show through the face plate.  
 * CPU holder mounted below relay
 * qty 2 angled brackets to hang unit to wall stud.
 
 
 ## parts I used
-* [Gredia G1 Hall effect wwater flow sensor](https://www.amazon.com/GREDIA-Sensor-Food-Grade-Flowmeter-Counter/dp/B07RF5D156/)  I used 2 sensors
+* [Gredia G1 Hall effect water flow sensor](https://www.amazon.com/GREDIA-Sensor-Food-Grade-Flowmeter-Counter/dp/B07RF5D156/)  I used 2 sensors
 * [3 gang box for assembly of entire unit](https://www.amazon.com/Madison-Electric-Products-MSB3G-Adjustable/dp/B00H8NUVQA)
 * [Silicone ribbon cable to connect sensors OLED](https://www.amazon.com/MECCANIXITY-Ribbon-Silicone-Stranded-Tinned/dp/B0CBB3C91V)
 
@@ -67,7 +67,7 @@ supports RS485 on Uart-1 but it is not needed for this purpose
   CAD drawing here.
     * QTY 2  6/32 by 1.5" machine screws - hold relay and cpu support to faceplate
     * Qty 6  #4 X 3/4" philips screw - connect faceplate to box
-    * Qty 6   #4 X 1/2" philips screw - connect oled to faceplate
+    * Qty 6   #4 X 1/2" philips screw - connect OLED to faceplate
 
 * CPU board holder to mount CPU board below digital relay - TODO: Add picture 
   and CAD drawing here.
@@ -77,36 +77,82 @@ supports RS485 on Uart-1 but it is not needed for this purpose
   small enough to keep inside the 3 gang unit.
 * [1.3" OLED display](https://www.aliexpress.us/item/2251832498844654.html)
 * [40 amp Digital Relay for AC](https://www.aliexpress.us/item/3256804475347699)
-* [Recomended CPU](https://www.aliexpress.us/item/3256805991471052.html) I used a propriatary board I made for another purpose but this CPU would have done just as well.
+* [Recommended CPU](https://www.aliexpress.us/item/3256805991471052.html) I used a proprietary board I made for another purpose but this CPU would have done just as well.
 * [Fuse holder for 10 amp fuse](https://www.amazon.com/KOLACEN-Automotive-Inline-5x20mm-Holder/dp/B071G1L98V) Installed on Live wire 
-* Wall Plug Genric 3 prong 120V outlet
+* Wall Plug Generic 3 prong 120V outlet
 * 3 prong male plug to supply power
 * 7 foot 3 conductor flexible wire for power supply cord
 
 ### Plumbing Parts
 Our system is based on 1" pex so we need to adapt the single water 
-pip to allow water to flow thorugh both sensors in parralell then 
-caputure the water back into a single pipe.
-* 1" PEX 90 from water source
-* PEX T and PEX 90 to feed water to two sensors
-* qty 2 -  1" Female NPT brass fittings to connect to sensors
-* qty 2 G1 sensors with male 1" NPT 
-* qty 2 - 1" Femal NPT  brass fitting for other side sensors
-* Pex 90 and Pex T 
-* Pex 90 to feed water back into pipe
+pip to allow water to flow through both sensors in parallel then 
+capture the water back into a single pipe.
+* SKIPPED: 1" PEX 90 from water source
+* SKIPPED: PEX T and PEX 90 to feed water to two sensors
+* qty 1 -  1" Female NPT brass fittings to connect to sensors
+* qty 1 G1 sensors with male 1" NPT 
+* qty 1 - 1" Female NPT  brass fitting for other side sensors
+* SKIPPED: Pex 90 and Pex T 
+* SKIPPED: Pex 90 to feed water back into pipe
 * Associated 1" Pex clamps  and Teflon tape for NPT connections.
 
 
-## Recomended Changes 
-* Use a 3.3V gate Triac such as [BTB06-600B](https://www.aliexpress.us/item/3256806576807703.html) in liue of solid state relay.  The Triac is smaller and capable of carrying the current needed for this applicaiton.
+## Recommended Changes  
+* Use a 3.3V gate Triac such as [BTB06-600B](https://www.aliexpress.us/item/3256806576807703.html) in lieu of solid state relay.  The Triac is smaller and capable of carrying the current needed for this application.
 
 * Make a new PCB with exact match for this use.
   * Add the triac direct to board with AC terminal lugs on board.  
-  * Add AC input to DC 3.3V power supply direct on board in liue of wall bud
+  * Add AC input to DC 3.3V power supply direct on board in lieu of wall bud
   * For buttons Add pull up resistors with bleed and direct wire to CPU but make jumper selectable so can choose to use them for capacitive sense if needed.  
-  * Consider adding fuse on board in-liue of pigtale fuse.  These changes
+  * Consider adding fuse on board in-lieu of pigtail fuse.  These changes
 would simplify wiring in the box. 
-* Consider Use Circuit breaker with external reset button in liue of inline fuse.
+* Consider Use Circuit breaker with external reset button in lieu of inline fuse.
+
+## Findings from First Week
+* Having a connector that allows rapid disconnect of unit from power and pulse 
+  sensor was very helpful allowing the unit to be easily removed and updated 
+  without hauling computer out to the water shed. 
+
+* CPU pin measuring output from Pulse sensors are picking up pulses from noise when 220V pump is activating.  This is triggering it to sense water flow that is not actually happening.  This caused over reporting of water use and pumping hydrogen peroxide when
+using unfiltered water which was undesirable.  To resolve this issue:
+  * Sensor wire proximity to pressure transducer or the wire from pump 
+    controller to pump seem to put out a lot of noise. Moving the wires
+    to keep the hall sensor signal wire away from those 2 removed 
+    about 90% of the noise. This also means that attention should 
+    be made when installing the flow sensor to keep it away from these
+    wires.
+  * Due to space limitations I only installed 1 G1 sensor.  The second 
+    sensor if not plugged in to a sensor was generating errant pulses.
+    fixed by disabling one of the sensors in software.
+  * Modify flow detection to require a 2LPM flow rater.   The lower end 
+    of the G1 resolution is around 1GMP so this should be adequate.  
+    This helped but the errant pulses still triggered changes.
+  * Modified the water flow detection logic to require water flow 
+    for 15 continuous seconds before activating injector pump.
+    Since the noise is not continuous **this eliminated nearly all 
+    of undesirable injector pump operation.**
+  * Next steps if needed:
+    * Move signal sensor wire into a ground shielded cable 
+    * Move main CPU as close as possible to flow sensor 
+      and/or keep the wire between CPU and flow sensor 
+      as short as possible. 
+    * Add a resistor in range of 50K to 250K to ground on 
+      sensor probe to help dampen noise from signal.
+    * Move the flow sensor so it is much further away 
+      from wires used by well pressure transducer and the 
+      220V wires for the pump and controller.  ** This 
+      would eliminate a majority of the problem **
+    * Consider a very small CPU board mounted on the sensor
+      with a RS485 signal to the main CPU mounted in the 
+      main switch console.  This keeps the digital AC relay
+      away from the sensor and would allow the sensor wire
+      to CPU counter to be very short and the RS485 is very 
+      resistant to local noise.  This would substantially 
+      increase software complexity and parts cost.
+
 
 ## Things that Failed
-* Current version of Arduino with ESP32 S3 mini used in this design does not properly route interupts from touch sensors.  They can be read find using touchRead.  Decided to just use normal old buttons instead but turned out that didn't need any user input at least not so far.
+* Current version of Arduino with ESP32 S3 mini used in this design does not properly route interrupts from touch sensors.  They can be read find using touchRead.  Decided to just use normal old buttons instead but turned out that didn't need any user input at least not so far.
+  * Arduino Version: 2.3.2 Date: 2024-02-20T09:54:08.669Z CLI Version: 0.35.3 
+  * ESP32 3.0.2 from Espressif
+  
