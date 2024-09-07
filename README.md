@@ -8,9 +8,9 @@ Our well water contains excessive levels of arsenic and iron, making it unsafe f
 
 We purchased a injector pump to inject hydrogen peroxide a powerful oxidizing agent.  This helps oxidize iron and arsenic before the water hits a 5 micron sediment filter then a green sand filter followed by a backwash style active carbon filter.  The early oxidization allows the green sand filter to remove more of the metals before it enters our downstream filter system.   
 
-The water, now with reduced metal content, is then fed to the house after passing through a water softener and arsenic removal filter. By reducing the metallic contaminants, we're extending the lifespan of these filters, which can be quite expensive to replace.  This investment in pre-filtration can save significant costs.
+The water, now with reduced metal content, is then fed to the house after passing through a water softener and arsenic removal filter. By reducing the metallic contaminants, we're extending the lifespan of these filters, which can be quite expensive to replace.  
 
-After installing the system, our original well pump failed and was replaced with a constant pressure pump. This change disrupted the power supply to the 110V injector pump. To conserve hydrogen peroxide, we've implemented a flow-based activation system. By monitoring the water flow into the filter system, we only activate the hydrogen peroxide pump when the filters are in operation. This significantly reduces our hydrogen peroxide consumption, given its cost of $36 per gallon.
+After installing the system, our original well pump failed and was replaced with a constant pressure pump. This change disrupted the power supply to the 110V injector pump. To conserve hydrogen peroxide, we've implemented a flow-based activation system. By monitoring the water flow into the filter system, we only activate the hydrogen peroxide pump when the filters are in operation. This significantly reduces our hydrogen peroxide consumption and costs since it runs about $36 per gallon.
 
 Our lawn water is draw off the system before the filtration system and does not cause water to flow through the sensor or pre-filter system which helps conserve hydrogen peroxide.
 
