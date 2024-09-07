@@ -1,12 +1,13 @@
 # water flow activated injector feed
 
 Activate hydrogen peroxide injector feed pump when water is flowing through Hall effect water flow sensor YF-B10.  Senses water flow movement through YF-B10 or Gredia G1 water flow sensor.  
-### TODO: Add Picture here
+![completed unit](img/completed-unit-1.jpg)
 
 The CPU drives a low side switch which activates a SSA-40 DA solid state relay to switch AC hot line to injector pump whenever we have water flowing through 
 sensors. 
 
-We use 2 Gredia G1 sensors to minimize water flow 
+We use a Gredia G1 measure water flow.  It is a uses a hall sensor to output pulses as a pelton style wheel turns as water flows through the unit
+![Gredia G1 water flow sensor end view](img/water-sensor-end-view.jpg)
 resistance through the sensors. That means we must compute flow through 
 both sensors and add together to get total flow.   
 
@@ -59,6 +60,8 @@ supports RS485 on Uart-1 but it is not needed for this purpose
 
 
 ## parts I used
+![Parts shown before assembly](img/exploded-parts.jpg)
+
 * [Gredia G1 Hall effect water flow sensor](https://www.amazon.com/GREDIA-Sensor-Food-Grade-Flowmeter-Counter/dp/B07RF5D156/)  I used 2 sensors
 * [3 gang box for assembly of entire unit](https://www.amazon.com/Madison-Electric-Products-MSB3G-Adjustable/dp/B00H8NUVQA)
 * [Silicone ribbon cable to connect sensors OLED](https://www.amazon.com/MECCANIXITY-Ribbon-Silicone-Stranded-Tinned/dp/B0CBB3C91V)
@@ -155,4 +158,3 @@ using unfiltered water which was undesirable.  To resolve this issue:
 * Current version of Arduino with ESP32 S3 mini used in this design does not properly route interrupts from touch sensors.  They can be read find using touchRead.  Decided to just use normal old buttons instead but turned out that didn't need any user input at least not so far.
   * Arduino Version: 2.3.2 Date: 2024-02-20T09:54:08.669Z CLI Version: 0.35.3 
   * ESP32 3.0.2 from Espressif
-  
