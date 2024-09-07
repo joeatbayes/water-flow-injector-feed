@@ -1,8 +1,19 @@
 # water flow activated injector feed
 
-Activate hydrogen peroxide injector feed pump when water is flowing through Hall effect water flow sensor YF-B10.  Senses water flow movement through YF-B10 or Gredia G1 water flow sensor.  
+Activate hydrogen peroxide injector feed pump when water is flowing through Hall effect based Gredia G1 water flow sensor.   Also acts a a water meter for our filtered water and shows us GPM draw which helps optimize different water usage.
 ![completed unit](img/completed-unit-1.jpg)
 
+## Overview
+Our well water contains excessive levels of arsenic and iron, making it unsafe for gardening. To address this issue, we've implemented a system designed to reduce these contaminants to below EPA standards. By oxidizing the metals, we can transform them into a form that can be effectively captured by our filtration system, allowing us to safely use the water for gardening purposes.   
+
+We purchased a injector pump to inject hydrogen peroxide a powerful oxidizing agent.  This helps oxidize iron and arsenic before the water hits a 5 micron sediment filter then a green sand filter followed by a backwash style active carbon filter.  The early oxidization allows the green sand filter to remove more of the metals before it enters our downstream filter system.   
+
+The water, now with reduced metal content, is then fed to the house after passing through a water softener and arsenic removal filter. By reducing the metallic contaminants, we're extending the lifespan of these filters, which can be quite expensive to replace.  This investment in pre-filtration can save significant costs.
+
+After installing the system, our original well pump failed and was replaced with a constant pressure pump. This change disrupted the power supply to the 110V injector pump. To conserve hydrogen peroxide, we've implemented a flow-based activation system. By monitoring the water flow into the filter system, we only activate the hydrogen peroxide pump when the filters are in operation. This significantly reduces our hydrogen peroxide consumption, given its cost of $36 per gallon.
+
+
+## process
 The CPU drives a low side switch which activates a SSA-40 DA solid state relay to switch AC hot line to injector pump whenever we have water flowing through 
 sensors. 
 
